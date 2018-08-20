@@ -10,9 +10,8 @@ This is a repository for extended
  A simple hello world page
  
  
+ #JS-work
+ a file for work exercises done with javascript.
+ 
 #javascript-practice-wrangell
  this is a web page used to access the javascript written as a solution to our class exercises.
-
-# defuse-the-bom
-Is a practice for working with the browser using javascript.
-
