@@ -1,4 +1,4 @@
-// "use strict";
+"use strict";
 
 
  prompt("hello, are you new here?")
