@@ -1,10 +1,128 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link href="https://fonts.googleapis.com/css?family=Oswald|Anton" rel="stylesheet">
+    <title>Document</title>
 </head>
 <body>
-$END$
+
+<style>
+    h1 {
+        text-align: center;
+        font-family: 'Anton', sans-serif;
+    }
+    p {
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
+    }
+    .city {
+        text-align: center;
+        text-decoration: underline;
+    }
+    #centerText {
+        text-align: center;
+    }
+    .panel-body {
+        background-color: #2b669a;
+    }
+    .round-box {
+        border-radius: 5px 30px 30px 30px;
+    }
+    .center {
+        display: flex;
+        justify-content: center;
+    }
+    .btn {
+    ;
+    }
+    #map-canvas {
+        height: 500px;
+        width: 97vw;
+    }
+</style>
+
+<div class="panel-body">
+
+    <h1>Weather Application</h1>
+
+    <div class="panel-body" id="weatherData"></div>
+    <div id="map-canvas"></div>
+
+    <!--<div class="row center">-->
+    <!--<input type="text" id="latitude" class="round-box" placeholder="Latitude">-->
+    <!--<input type="text" id="longitude" class="round-box" placeholder="Longitude">-->
+    <!--<button class="btn btn-info" id="update">Search</button>-->
+    <!--</div>-->
+
+</div>
+
+<script src="js/jquery-2.2.4.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"crossorigin="anonymous"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCn9GeDl6Lsf9TUa9PYko-CTC3qZhNMV2I"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        "use strict";
+        var mapOptions = {
+            zoom: 5,
+            center: {
+                lat:  29.426791,
+                lng: -98.489602
+            }
+        };
+        var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+        google.maps.event.addListener(map, "click", function(e) {
+            var position = {lat: e.latLng.lat(), lng: e.latLng.lng()};
+            console.log(position);
+            var marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                draggable: true,
+                animation: google.maps.Animation.DROP
+            });
+            makeRequestAndUpdatePage(position, map);
+            google.maps.event.addListener(marker, "dragend", function(e) {
+                makeRequestAndUpdatePage(e.latLng, map);
+            });
+        });
+        function makeRequestAndUpdatePage(position, map) {
+            var begin = $.get("http://api.openweathermap.org/data/2.5/forecast/daily", {
+                APPID: "b74f84c8a208935dad0559b2dbeb40a6",
+                cnt: 3,
+                lat: position.lat,
+                lon: position.lng,
+                units: 'imperial'
+            });
+            begin.fail(function (arg1, arg2, arg3) {
+                console.log(arg1);
+                console.log(arg2);
+                console.log(arg3);
+            });
+            begin.done(function (data) {
+                console.log(data);
+                buildHTML(data);
+            });
+        }
+        function buildHTML(data) {
+            var weatherHTML = "";
+            weatherHTML += "<p class='city'>" + data.city.name + "</p>";
+            data.list.forEach(function (forecast) {
+                weatherHTML += "<div id='centerText' class='col-xs-4 col-sm-4 col-md-4'>";
+                weatherHTML += "<p style='font-size: 200%'>" + Math.round(forecast.temp.max) + "&deg;" + "/" + Math.round(forecast.temp.min) + "&deg;" + "</p>";
+                weatherHTML += "<img src='http://openweathermap.org/img/w/" + forecast.weather[0].icon + ".png'>";
+                weatherHTML += "<p>" + forecast.weather[0].main + ": " + forecast.weather[0].description + "</p>";
+                weatherHTML += "<p> Humidity: " + forecast.humidity + "</p>";
+                weatherHTML += "<p> Wind: " + forecast.speed + "</p>";
+                weatherHTML += "<p> Pressure: " + forecast.pressure + "</p>";
+                weatherHTML += "</div>";
+            });
+            $("#weatherData").html(weatherHTML);
+        }
+    });
+</script>
 </body>
 </html>
